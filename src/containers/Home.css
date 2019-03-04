@@ -12,14 +12,34 @@
   color: #999;
 }
 
-.Home .notes h4 {
+.Home .bounties h4 {
   font-family: "Open Sans", sans-serif;
   font-weight: 600;
   overflow: hidden;
   line-height: 1.5;
   white-space: nowrap;
   text-overflow: ellipsis;
+  justify-content: flex-end;
 }
-.Home .notes p {
-  color: #666;
+
+
+.bountyItemFlex {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
 }
+
+.title{
+	margin-right: auto;
+}
+
+.exp {
+	flex-basis: 25%;
+	text-align:center;
+}
+
+.value {
+	flex-basis: 10%; 
+	text-align:center;
+}
+

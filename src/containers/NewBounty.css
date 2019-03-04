@@ -1,0 +1,21 @@
+.NewBounty form {
+  padding-bottom: 15px;
+}
+
+.NewBounty form textarea {
+  height: 200px;
+  font-size: 15px;
+}
+
+.colInput{
+  padding-right: 0px
+}
+
+
+.active{
+  padding-top: 0px
+}
+
+.numberInput{
+  width: 60px;
+}

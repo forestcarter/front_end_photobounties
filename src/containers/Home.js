@@ -3,87 +3,82 @@ import { PageHeader, ListGroup, ListGroupItem } from "react-bootstrap";
 import "./Home.css";
 import { API } from "aws-amplify";
 import { LinkContainer } from "react-router-bootstrap";
+import BountyItem from "../components/BountyItem";
+import BountyItemTitle from "../components/BountyItemTitle";
+import formatExpire from "../functions";
+
+//import BootstrapTable from "react-bootstrap-table-next";
+import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
+import "react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css";
+
 
 export default class Home extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isLoading: true,
-      notes: []
-    };
-  }
-
-  async componentDidMount() {
-    if (!this.props.isAuthenticated) {
-      console.log('not')
-      return;
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: true,
+            bounties: []
+        };
+	}
+	
+    async componentDidMount() {
+        try {
+            const bounties = await this.bounties();
+            this.setState({ bounties : bounties });
+        } catch (e) {
+            alert(e);
+        }
+        this.setState({ isLoading : false });
     }
-  
-    try {
-      const notes = await this.notes();
-      this.setState({ notes });
-    } catch (e) {
-      alert(e);
+
+    bounties() {
+        return API.get("bounties", "/bounties");
+	}
+
+	renderBounties() {
+		return (
+		  <div className="bounties">
+			<PageHeader>Bounties</PageHeader>
+			<ListGroup>
+				<ListGroupItem>
+					<BountyItemTitle/>
+				</ListGroupItem>
+			  {!this.state.isLoading && this.renderBountiesList(this.state.bounties)}
+			</ListGroup>
+		  </div>
+		);
+	  }
+
+	  
+	renderBountiesList(bounties) {
+		return [{}].concat(bounties).map(
+		  (bounty, i) =>
+		  i !== 0 ?
+			<LinkContainer
+				key={bounty.bountyId}
+				to={`/bounties/${bounty.userId}/${bounty.bountyId}`}
+			>
+			<ListGroupItem>
+				<BountyItem 
+					title={bounty.title}
+					exp={formatExpire(bounty.expiration)}
+					value={bounty.value}
+					/>
+              </ListGroupItem>
+			</LinkContainer>
+			:null
+		);
+	  }
+
+    render() {
+        return (
+			<div className="Home">
+			{this.renderBounties()}
+
+
+            </div>
+        );
     }
-  
-    this.setState({ isLoading: false });
-  }
-  
-  notes() {
-    return API.get("notes", "/notes");
-  }
-
-  renderNotesList(notes) {
-    return [{}].concat(notes).map(
-      (note, i) =>
-        i !== 0
-          ? <LinkContainer
-              key={note.noteId}
-              to={`/notes/${note.noteId}`}
-            >
-              <ListGroupItem header={note.content.trim().split("\n")[0]}>
-                {"Created: " + new Date(note.createdAt).toLocaleString()}
-              </ListGroupItem>
-            </LinkContainer>
-          : <LinkContainer
-              key="new"
-              to="/notes/new"
-            >
-              <ListGroupItem>
-                <h4>
-                  <b>{"\uFF0B"}</b> Create a new note
-                </h4>
-              </ListGroupItem>
-            </LinkContainer>
-    );
-  }
-
-  renderLander() {
-    return (
-      <div className="lander">
-        <h1>Scratch</h1>
-        <p>A simple note taking app</p>
-      </div>
-    );
-  }
-
-  renderNotes() {
-    return (
-      <div className="notes">
-        <PageHeader>Bounties</PageHeader>
-        <ListGroup>
-          {!this.state.isLoading && this.renderNotesList(this.state.notes)}
-        </ListGroup>
-      </div>
-    );
-  }
-
-  render() {
-    return (
-      <div className="Home">
-        {this.props.isAuthenticated ? this.renderNotes() : this.renderLander()}
-      </div>
-    );
-  }
 }
+
+

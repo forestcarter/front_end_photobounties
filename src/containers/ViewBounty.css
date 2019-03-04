@@ -1,0 +1,8 @@
+.bounties form {
+  padding-bottom: 15px;
+}
+
+.bounties form textarea {
+  height: 300px;
+  font-size: 24px;
+}

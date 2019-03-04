@@ -5,9 +5,9 @@ import Login from "./containers/Login";
 import NotFound from "./containers/NotFound";
 import AppliedRoute from "./components/AppliedRoute";
 import Signup from "./containers/Signup";
-import NewNote from "./containers/NewNote";
-import Notes from "./containers/Notes";
-import AuthenticatedRoute from "./components/AuthenticatedRoute";
+import NewBounty from "./containers/NewBounty";
+import ViewBounty from "./containers/ViewBounty";
+//import AuthenticatedRoute from "./components/AuthenticatedRoute";
 import UnauthenticatedRoute from "./components/UnauthenticatedRoute";
 import HowItWorks from "./containers/howitworks";
 
@@ -18,9 +18,9 @@ export default ({ childProps }) =>
     <UnauthenticatedRoute path="/login" exact component={Login} props={childProps} />
     <UnauthenticatedRoute path="/signup" exact component={Signup} props={childProps} />
     <UnauthenticatedRoute path="/howitworks" exact component={HowItWorks} props={childProps} />
-    
-    <AuthenticatedRoute path="/notes/new" exact component={NewNote} props={childProps} />
-    <AuthenticatedRoute path="/notes/:id" exact component={Notes} props={childProps} />
+	<AppliedRoute path="/bounties/:userId/:bountyId" exact component={ViewBounty} props={childProps} />
+
+    <AppliedRoute path="/new" exact component={NewBounty} props={childProps} />
     { /* Finally, catch all unmatched routes */ }
     <Route component={NotFound} />
   </Switch>;

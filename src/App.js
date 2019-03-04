@@ -57,9 +57,12 @@ class App extends Component {
 
   handleLogout = async event => {
     await Auth.signOut();
-  
     this.userHasAuthenticated(false);
     this.props.history.push("/login");
+  }
+
+  handleNewBounty = event => {
+    this.props.history.push("/new");
   }
   
 
@@ -75,14 +78,17 @@ class App extends Component {
         <Navbar fluid collapseOnSelect>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link to="/">Scratch</Link>
+              <Link to="/">Bounties</Link>
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>
               {this.state.isAuthenticated
-                ? <NavItem onClick={this.handleLogout}>Logout</NavItem>
+                ? <Fragment>
+                <NavItem onClick={this.handleNewBounty}>Post Bounty</NavItem>
+                  <NavItem onClick={this.handleLogout}>Logout</NavItem>
+                  </Fragment>
                 : <Fragment>
                     <LinkContainer to="/signup">
                       <NavItem>Signup</NavItem>
