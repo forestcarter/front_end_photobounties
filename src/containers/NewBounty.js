@@ -48,7 +48,8 @@ export default class NewBounty extends Component {
         description: this.state.description,
         value: this.state.value,
         hours: this.state.hours,
-        days: this.state.days
+		days: this.state.days,
+		email:this.props.userIdToken.idToken.payload.email
       });
       this.props.history.push("/");
     } catch (e) {
@@ -58,6 +59,7 @@ export default class NewBounty extends Component {
   };
 
   createBounty(bounty) {
+	  console.log(bounty)
     return API.post("bounties", "/bounties", {
       body: bounty
     });

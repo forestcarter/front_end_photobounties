@@ -1,7 +1,16 @@
 
-export default function formatExpire(exp) {
+export default function formatExpire(bounty) {
+	if(bounty.posterDispute===false){
+		return "Accepted"
+	} 
+	if(bounty.posterDispute===true){
+		return "Disputed"
+	}
+	if(bounty.submission){
+		return "Claimed"
+	} 
 	
-    const expDate = new Date(exp).getTime() - new Date().getTime();
+    const expDate = new Date(bounty.expiration).getTime() - new Date().getTime();
     const days = Math.round(expDate / (24 * 60 * 60 * 1000));
     const hours = Math.round(
         (expDate % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)

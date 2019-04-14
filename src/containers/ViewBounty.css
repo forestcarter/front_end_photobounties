@@ -3,6 +3,11 @@
 }
 
 .bounties form textarea {
-  height: 300px;
-  font-size: 24px;
+  height: 200px;
+  font-size: 16px;
 }
+
+/* .disputeTextArea{
+	height: 200px;
+    font-size: 14px;
+} */

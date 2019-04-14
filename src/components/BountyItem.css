@@ -1,0 +1,23 @@
+
+.bountyItemFlex {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+}
+
+.title{
+	margin-right: auto;
+}
+
+.exp {
+	width:12rem;
+	flex: none;
+	text-align:center;
+}
+
+.value {
+	width:7rem;
+	flex: none;
+	text-align:center;
+}
+

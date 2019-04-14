@@ -56,7 +56,6 @@ export default class Signup extends Component {
             this.setState({
                 newUser
             });
-            console.log(newUser);
             try {
                 await this.setCredit({
                     email: this.state.email

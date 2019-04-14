@@ -23,8 +23,12 @@ export default class Home extends Component {
 	
     async componentDidMount() {
         try {
-            const bounties = await this.bounties();
-            this.setState({ bounties : bounties });
+			const bounties = await this.bounties();
+			var filtered = bounties.filter((bounty)=>{
+				return true
+			});
+
+            this.setState({ bounties : filtered });
         } catch (e) {
             alert(e);
         }
@@ -51,6 +55,7 @@ export default class Home extends Component {
 
 	  
 	renderBountiesList(bounties) {
+		console.log(bounties)
 		return [{}].concat(bounties).map(
 		  (bounty, i) =>
 		  i !== 0 ?
@@ -61,7 +66,7 @@ export default class Home extends Component {
 			<ListGroupItem>
 				<BountyItem 
 					title={bounty.title}
-					exp={formatExpire(bounty.expiration)}
+					exp={formatExpire(bounty)}
 					value={bounty.value}
 					/>
               </ListGroupItem>
