@@ -37,10 +37,10 @@ export default class Home extends Component {
 
 	renderBounties() {
 		const postedBounties = this.state.bounties.filter((bounty)=>{
-			return bounty.userId===this.props.userIdToken.idToken.payload.email
+			return bounty.userId===this.props.userIdToken.idToken.payload['cognito:username']
 		})
 		const claimedBounties = this.state.bounties.filter((bounty)=>{
-			return bounty.claimer===this.props.userIdToken.idToken.payload.email
+			return bounty.claimer===this.props.userIdToken.idToken.payload['cognito:username']
 		})
 		console.log(this.state.bounties)
 		return (

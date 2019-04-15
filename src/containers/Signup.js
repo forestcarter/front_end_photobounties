@@ -71,9 +71,21 @@ export default class Signup extends Component {
     };
 
     handleConfirmationSubmit = async event => {
-        event.preventDefault();
-        this.setState({ isLoading: true });
-    };
+		event.preventDefault();
+	  
+		this.setState({ isLoading: true });
+	  
+		try {
+		  await Auth.confirmSignUp(this.state.email, this.state.confirmationCode);
+		  await Auth.signIn(this.state.email, this.state.password);
+	  
+		  this.props.userHasAuthenticated(true);
+		  this.props.history.push("/");
+		} catch (e) {
+		  alert(e.message);
+		  this.setState({ isLoading: false });
+		}
+	  }
 
     setCredit(info) {
         return API.post("bounties", "/credit", {

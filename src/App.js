@@ -6,6 +6,7 @@ import { Link, withRouter } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
 import { Auth } from "aws-amplify";
 import config from "./config";
+import Email from "./components/Email"
 
 class App extends Component {
     constructor(props) {
@@ -13,7 +14,8 @@ class App extends Component {
         this.state = {
             isAuthenticated: false,
             isAuthenticating: true,
-            userIdToken: null
+			userIdToken: null,
+			attempts:1
         };
     }
 
@@ -29,7 +31,9 @@ class App extends Component {
             }
         }
 		this.setState({ isAuthenticating: false });
-    }
+	}
+	
+	
     loadFacebookSDK() {
         window.fbAsyncInit = function() {
             window.FB.init({
@@ -53,9 +57,9 @@ class App extends Component {
         })(document, "script", "facebook-jssdk");
     }
 
-    userHasAuthenticated = authenticated => {
-        this.setState({ isAuthenticated: authenticated });
-    };
+    userHasAuthenticated = (authenticated) => {
+		this.setState({ isAuthenticated: authenticated });
+	    };
 
     setUserIdToken = userIdToken => {
         this.setState({ userIdToken: userIdToken });
@@ -63,7 +67,8 @@ class App extends Component {
 
     handleLogout = async event => {
         await Auth.signOut();
-        this.userHasAuthenticated(false);
+		this.userHasAuthenticated(false);
+		this.setUserIdToken(null)
         this.props.history.push("/login");
     };
 
@@ -76,12 +81,16 @@ class App extends Component {
     };
 
     render() {
+		console.log(this.state)
         const childProps = {
             isAuthenticated: this.state.isAuthenticated,
             userHasAuthenticated: this.userHasAuthenticated,
-            userIdToken: this.state.userIdToken
-        };
-
+			userIdToken: this.state.userIdToken,
+			setUserIdToken:this.setUserIdToken
+			
+		};
+		if (this.state.userIdToken)console.log(this.state.userIdToken.idToken.payload['cognito:username'])
+		
         return (
             !this.state.isAuthenticating && (
                 <div className="App container">
@@ -98,8 +107,12 @@ class App extends Component {
                                     <Fragment>
                                         <NavItem
                                             onClick={this.handleMyBounties}
-                                        >
-                                            {this.state.userIdToken.idToken.payload.email?this.state.userIdToken.idToken.payload.email:''}
+										>
+										<Email
+										email={this.state.userIdToken?this.state.userIdToken.idToken.payload.email:''}
+											
+										/>
+										
                                         </NavItem>
                                         <NavItem onClick={this.handleNewBounty}>
                                             Post Bounty

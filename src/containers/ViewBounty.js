@@ -8,6 +8,8 @@ import formatExpire from "../functions";
 import { s3Upload } from "../libs/awsLib";
 import BountyItem from "../components/BountyItem";
 import BountyItemTitle from "../components/BountyItemTitle";
+import StaffRuling from "../components/StaffRuling";
+
 import { ListGroup, ListGroupItem } from "react-bootstrap";
 
 export default class ViewBounty extends Component {
@@ -17,12 +19,10 @@ export default class ViewBounty extends Component {
 
         this.state = {
 			acceptBounty: true,
-			acceptDispute: true,
             review: false,
             isPoster: false,
             isClaimer: false,
             isLoading: null,
-            isDeleting: null,
             bounty: null,
             content: "",
             submissionURL: null,
@@ -37,14 +37,6 @@ export default class ViewBounty extends Component {
         }
 	};
 	
-	handleDisputeOptionChange = e => {
-        if (e.target.checked) {
-            this.setState(prevState => ({
-                acceptDispute: !prevState.acceptDispute
-            }));
-        }
-    };
-
     handleTextChange = event => {
         this.setState({
             disputeThanksText: event.target.value
@@ -54,20 +46,7 @@ export default class ViewBounty extends Component {
     async componentDidMount() {
         try {
 			const bounty = await this.getBounty();
-			const fakebounty= {
-				bountyId: "70a5d110-597d-11e9-8e18-273e82ff726f",
-				claimer: "forest.carter@gmail.com",
-				claimerDispute: null,
-				createdAt: 1554673090721,
-				description: "6",
-				expiration: 1555213090720,
-				posterDispute: true,
-				posterDisputeText: 'it was trash',
-				submission: '1554683538738-del.jpg',
-				title: "6",
-				userId: "forest.carter7@gmail.com",
-				value: "6"
-			}
+			
             if (bounty.submission) {
                 const submissionURL = await Storage.vault.get(
                     bounty.submission
@@ -79,10 +58,9 @@ export default class ViewBounty extends Component {
 				
             }
             const isPoster =
-                bounty.userId === this.props.userIdToken.idToken.payload.email;
+                bounty.userId === this.props.userIdToken.idToken.payload['cognito:username'];
             const isClaimer =
-				bounty.claimer === this.props.userIdToken.idToken.payload.email;
-				
+				bounty.claimer === this.props.userIdToken.idToken.payload['cognito:username'];
 				
             this.setState({
                 bounty: bounty,
@@ -90,7 +68,8 @@ export default class ViewBounty extends Component {
                 isClaimer,
 			});
                 
-            console.log(bounty);
+			console.log(bounty);
+			console.log(isClaimer)
         } catch (e) {
             alert(e);
         }
@@ -108,21 +87,24 @@ export default class ViewBounty extends Component {
     attachSubmission(attachment) {
         return API.put("bounties", "/bounties", {
             body: {
-                userId: this.props.userIdToken.idToken.payload.email,
+				userId: this.state.bounty.userId,
                 bountyId: this.props.match.params.bountyId,
-                submission: attachment,
-                claiming: true
+                claiming: true,
+				claimerId: this.props.userIdToken.idToken.payload['cognito:username'],
+                submission: attachment
             }
         });
     }
     submitText(accept, text) {
+		const disputing = this.state.isClaimer?'claimer':'poster'
         return API.put("bounties", "/bounties", {
             body: {
-                userId: this.props.userIdToken.idToken.payload.email,
+                userId: this.state.bounty.userId,
                 bountyId: this.props.match.params.bountyId,
-                claiming: false,
-                posterDispute: !accept,
-                posterDisputeText: text
+				claiming: false,
+				disputing:disputing,
+                disputeBool: !accept,
+                disputeText: text
             }
         });
     }
@@ -179,6 +161,7 @@ export default class ViewBounty extends Component {
     };
 
     render() {
+		console.log(this.state)
         return (
             <div className="bounties">
                 {this.state.bounty && (
@@ -239,7 +222,9 @@ export default class ViewBounty extends Component {
                                 />
                             </div>
                         ) : (
-                            <div>
+							//If a submission is present 
+							<div>
+							{(this.state.isPoster||this.state.isClaimer) && (
                                 <FormGroup>
                                     <ControlLabel>Submitted Photo</ControlLabel>
                                     <FormControl.Static>
@@ -253,11 +238,13 @@ export default class ViewBounty extends Component {
                                             )}
                                         </a>
                                     </FormControl.Static>
-                                </FormGroup>
+								</FormGroup>
+							)}
                                 {this.state.isPoster && (
 									<div>
                                     {this.state.bounty.posterDispute ===
 											null && (
+												//If poster is looking and has not submitted a dispute
 											<div>
 												<div className="form-check">
 													<label>
@@ -272,8 +259,7 @@ export default class ViewBounty extends Component {
 															}
 															className="form-check-input"
 															onChange={
-																this
-																	.handleOptionChange
+																this.handleOptionChange
 															}
 														/>
 														Accept Bounty
@@ -336,19 +322,39 @@ export default class ViewBounty extends Component {
 									{this.state.bounty.posterDispute ===
 											false && (
 											<div>
-												<h1>Accepted</h1>
+												<h3>Status: You accepted this bounty submission</h3>
 											</div>
 										)}
 
-									{ this.state.bounty.posterDispute ===
-											true && (
+									{this.state.bounty.posterDispute && this.state.bounty.claimerDispute === null
+											&& (
 											<div>
-												<h1>Disputed</h1>
+												<FormGroup controlId="description">
+													<ControlLabel>Poster's Comments</ControlLabel>
+														<FormControl
+														componentClass="textarea"
+														value={this.state.bounty.posterDisputeText}
+														readOnly
+													/>
+												</FormGroup>
+												<h3>Status: Waiting for claimer to review dispute</h3>
+											</div>
+										)}
+									{this.state.bounty.posterDispute && this.state.bounty.claimerDispute
+											&& (
+											<div>
+												<h3>Status: Claimer rejected Dispute</h3>
+												<StaffRuling
+													ruledForPoster={this.state.bounty.ruledForPoster}
+													rulingText={this.state.bounty.rulingText}
+												/>
 											</div>
 										)}
 									</div>
-								)}								
-                                {this.state.isClaimer && (
+								)//End if poster
+							}			
+													
+                                {this.state.isClaimer && this.state.bounty.posterDispute && (
 									<div>
 
 									<FormGroup controlId="description">
@@ -371,12 +377,12 @@ export default class ViewBounty extends Component {
                                                             value="option1"
                                                             checked={
                                                                 this.state
-                                                                    .acceptDispute ===
+                                                                    .acceptBounty ===
                                                                 true
                                                             }
                                                             className="form-check-input"
                                                             onChange={
-                                                                this.handleDisputeOptionChange
+                                                                this.handleOptionChange
                                                             }
                                                         />
                                                         Accept Dispute
@@ -392,11 +398,11 @@ export default class ViewBounty extends Component {
                                                             className="form-check-input"
                                                             checked={
                                                                 this.state
-                                                                    .acceptDispute ===
+                                                                    .acceptBounty ===
                                                                 false
                                                             }
                                                             onChange={
-                                                                this.handleDisputeOptionChange
+                                                                this.handleOptionChange
                                                             }
                                                         />
                                                         Reject Dispute
@@ -407,8 +413,7 @@ export default class ViewBounty extends Component {
                                                     <ControlLabel />
                                                     <FormControl
                                                         onChange={
-                                                            this
-                                                                .handleTextChange
+                                                            this.handleTextChange
                                                         }
                                                         componentClass="textarea"
                                                         placeholder={
@@ -429,7 +434,7 @@ export default class ViewBounty extends Component {
                                                         this.state.isLoading
                                                     }
                                                     text={
-                                                        this.state.acceptDispute
+                                                        this.state.acceptBounty
                                                             ? "Accept Dispute"
                                                             : "Reject Dispute"
                                                     }
@@ -441,16 +446,22 @@ export default class ViewBounty extends Component {
                                         {this.state.bounty.claimerDispute ===
                                             false && (
                                             <div>
-                                                <h1>Dispute Accepted</h1>
+                                                <h3>Status: You accepted this dispute. The bounty is canceled.</h3>
                                             </div>
                                         )}
 
                                         {this.state.bounty.claimerDispute ===
                                             true && (
                                             <div>
-                                                <h1>Dispute Rejected</h1>
+												<h3>Status: You rejected this dispute.</h3>
+												<StaffRuling
+													ruledForPoster={this.state.bounty.ruledForPoster}
+													rulingText={this.state.bounty.rulingText}
+												/>
                                             </div>
-                                        )}
+										)}
+										
+
                                     </div>
                                 )}
                             </div>

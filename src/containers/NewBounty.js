@@ -49,7 +49,8 @@ export default class NewBounty extends Component {
         value: this.state.value,
         hours: this.state.hours,
 		days: this.state.days,
-		email:this.props.userIdToken.idToken.payload.email
+		email:this.props.userIdToken.idToken.payload.email,
+		userId:this.props.userIdToken.idToken.payload['cognito:username']
       });
       this.props.history.push("/");
     } catch (e) {
@@ -85,7 +86,8 @@ export default class NewBounty extends Component {
             <Col xs={2} className='colInput'>
               <FormControl
                 id="value"
-                type="number"
+				type="number"
+				min="1"
                 className='numberInput'
                 onChange={this.handleChange}
                 value={this.state.value}
@@ -99,7 +101,8 @@ export default class NewBounty extends Component {
             <Col xs={2} className='colInput'>
               <FormControl
                 id="days"
-                type="number"
+				type="number"
+				min="0"
                 className='numberInput'
                 onChange={this.handleChange}
                 value={this.state.days}
@@ -111,7 +114,8 @@ export default class NewBounty extends Component {
 
             <Col xs={2} className='colInput'>
               <FormControl
-                id="hours"
+				id="hours"
+				min="0"
                 type="number"
                 className='numberInput'
                 onChange={this.handleChange}

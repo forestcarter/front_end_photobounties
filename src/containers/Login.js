@@ -30,9 +30,12 @@ export default class Login extends Component {
     event.preventDefault();
     this.setState({ isLoading: true });
     try {
-      await Auth.signIn(this.state.email, this.state.password);
-      this.props.userHasAuthenticated(true);
-      //this.props.history.push("/");
+	  await Auth.signIn(this.state.email, this.state.password);
+	  let userIdToken = await Auth.currentSession();
+    	this.props.setUserIdToken(userIdToken);
+	  this.props.userHasAuthenticated(true);
+	  
+      this.props.history.push("/");
     } catch (e) {
       alert(e.message);
       this.setState({ isLoading: false });
