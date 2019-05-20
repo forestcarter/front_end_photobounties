@@ -55,10 +55,11 @@ export default class Signup extends Component {
             });
             this.setState({
                 newUser
-            });
+			});
+			console.log(this.state.newUser.userSub)
             try {
                 await this.setCredit({
-                    email: this.state.email
+					userId: this.state.newUser.userSub
                 });
             } catch (e) {
                 alert(e);

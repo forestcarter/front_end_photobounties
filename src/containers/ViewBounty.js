@@ -46,23 +46,29 @@ export default class ViewBounty extends Component {
     async componentDidMount() {
         try {
 			const bounty = await this.getBounty();
+
+
+			const isPoster =
+				bounty.userId === this.props.userIdToken?this.props.userIdToken.idToken.payload['cognito:username']:false;
+			const isClaimer =
+				bounty.claimer === this.props.userIdToken? this.props.userIdToken.idToken.payload['cognito:username']:false;
 			
             if (bounty.submission) {
-                const submissionURL = await Storage.vault.get(
-                    bounty.submission
-                );
-                this.setState({
-                    review: true,
-                    submissionURL: submissionURL
-				});
+				this.setState({
+					review: true
+				}); 
 				
-            }
-            const isPoster =
-                bounty.userId === this.props.userIdToken.idToken.payload['cognito:username'];
-            const isClaimer =
-				bounty.claimer === this.props.userIdToken.idToken.payload['cognito:username'];
+				if(isPoster||isClaimer){
+					const submissionURL = await Storage.vault.get(
+					bounty.submission
+					);
+					this.setState({
+						submissionURL: submissionURL
+					}); 
+				}
+			}
 				
-            this.setState({
+				this.setState({
                 bounty: bounty,
                 isPoster,
                 isClaimer,
@@ -76,6 +82,7 @@ export default class ViewBounty extends Component {
     }
 
     getBounty() {
+		console.log(this.props.match.params)
         return API.get(
             "bounties",
             `/bounties/${this.props.match.params.userId}/${

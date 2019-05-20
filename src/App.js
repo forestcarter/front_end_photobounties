@@ -4,9 +4,11 @@ import "./App.css";
 import Routes from "./Routes";
 import { Link, withRouter } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
-import { Auth } from "aws-amplify";
+import { Auth, API } from "aws-amplify";
 import config from "./config";
 import Email from "./components/Email"
+import UserCredit from "./components/UserCredit"
+
 
 class App extends Component {
     constructor(props) {
@@ -24,7 +26,7 @@ class App extends Component {
         try {
             let userIdToken = await Auth.currentSession();
             this.setUserIdToken(userIdToken);
-            this.userHasAuthenticated(true);
+			this.userHasAuthenticated(true);
         } catch (e) {
             if (e !== "No current user") {
                 alert(e);
@@ -61,8 +63,11 @@ class App extends Component {
 		this.setState({ isAuthenticated: authenticated });
 	    };
 
-    setUserIdToken = userIdToken => {
-        this.setState({ userIdToken: userIdToken });
+    setUserIdToken = async userIdToken => {
+		this.setState({ userIdToken: userIdToken });
+		const userCredit = await API.get("bounties", "/credit");
+		//const userCredit={credit:5}
+		this.setState({ userIdToken: userIdToken, userCredit:userCredit.credit }); 
     };
 
     handleLogout = async event => {
@@ -81,16 +86,13 @@ class App extends Component {
     };
 
     render() {
-		console.log(this.state)
         const childProps = {
             isAuthenticated: this.state.isAuthenticated,
             userHasAuthenticated: this.userHasAuthenticated,
 			userIdToken: this.state.userIdToken,
 			setUserIdToken:this.setUserIdToken
 			
-		};
-		if (this.state.userIdToken)console.log(this.state.userIdToken.idToken.payload['cognito:username'])
-		
+		};		
         return (
             !this.state.isAuthenticating && (
                 <div className="App container">
@@ -105,15 +107,22 @@ class App extends Component {
                             <Nav pullRight>
                                 {this.state.isAuthenticated ? (
                                     <Fragment>
+										<NavItem
+											onClick={this.handleMyBounties}
+										>
+											<UserCredit
+												userCredit={this.state.userIdToken?this.state.userCredit:''} 
+											/>
+										</NavItem>
                                         <NavItem
                                             onClick={this.handleMyBounties}
 										>
 										<Email
-										email={this.state.userIdToken?this.state.userIdToken.idToken.payload.email:''}
+											email={this.state.userIdToken?this.state.userIdToken.idToken.payload.email:''}
 											
 										/>
 										
-                                        </NavItem>
+										</NavItem>
                                         <NavItem onClick={this.handleNewBounty}>
                                             Post Bounty
                                         </NavItem>
