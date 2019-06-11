@@ -21,11 +21,11 @@ export default function formatExpire(bounty) {
 	
     const dateTimeDisplay =
         days > 1
-            ? `${days} Days`
+            ? `Expires in ${days} Days`
             : hours > 1
-            ? `${hours} Hours`
+            ? `Expires in ${hours} Hours`
             : minutes > 0
-            ? `${minutes} Minutes`
+            ? `Expires in ${minutes} Minutes`
             : "Expired";
     return dateTimeDisplay;
 }

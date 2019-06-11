@@ -10,9 +10,14 @@
 }
 
 .exp {
-	width:12rem;
+	width:15rem;
 	flex: none;
 	text-align:center;
+}
+
+#statusSelect {
+	width:12rem;
+	margin:auto;
 }
 
 .value {
