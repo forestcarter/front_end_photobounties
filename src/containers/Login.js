@@ -8,7 +8,6 @@ import FacebookButton from "../components/FacebookButton";
 export default class Login extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             isLoading: false,
             email: "",
@@ -35,7 +34,7 @@ export default class Login extends Component {
             this.props.setUserIdToken(userIdToken);
             this.props.userHasAuthenticated(true);
 
-            this.props.history.push("/");
+            this.props.history.push("/home");
         } catch (e) {
             alert(e.message);
             this.setState({ isLoading: false });

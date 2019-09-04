@@ -132,7 +132,7 @@ export default class ViewBounty extends Component {
                     this.state.acceptBounty,
                     this.state.disputeThanksText
                 );
-                this.props.history.push("/");
+                this.props.history.push("/home");
             } catch (e) {
                 alert(e);
                 this.setState({ isLoading: false });
@@ -159,7 +159,7 @@ export default class ViewBounty extends Component {
                     alert("Bounty not submitted");
                 }
 
-                this.props.history.push("/");
+                this.props.history.push("/home");
             } catch (e) {
                 alert(e);
                 this.setState({ isLoading: false });

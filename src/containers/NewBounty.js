@@ -52,7 +52,7 @@ export default class NewBounty extends Component {
                     "cognito:username"
                 ]
             });
-            this.props.history.push("/");
+            this.props.history.push("/home");
         } catch (e) {
             alert(e);
             this.setState({ isLoading: false });

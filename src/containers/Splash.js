@@ -1,7 +1,10 @@
-import React from "react";
+import React, {Component} from "react";
 import "./Splash.css";
-
-export default () => (
+import { Button } from "react-bootstrap";
+export default class Splash extends Component{
+	
+render(){
+	return(
     <div className="splashDiv">
         <h2 id="splashTitle">Welcome to Photo Bounties!</h2>
         <div id="categories">
@@ -31,5 +34,13 @@ export default () => (
                 </ul>
             </div>
         </div>
+        <Button
+            className="splashButton btn btn-primary"
+            onClick={() => {
+                this.props.history.push("/home");
+            }}
+        >
+            View Bounties
+        </Button>
     </div>
-);
+)}}
