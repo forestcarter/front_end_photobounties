@@ -1,13 +1,8 @@
 .bounties form {
-  padding-bottom: 15px;
+    padding-bottom: 15px;
 }
 
 .bounties form textarea {
-  height: 200px;
-  font-size: 16px;
+    height: 200px;
+    font-size: 16px;
 }
-
-/* .disputeTextArea{
-	height: 200px;
-    font-size: 14px;
-} */

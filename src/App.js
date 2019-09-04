@@ -66,7 +66,6 @@ class App extends Component {
     setUserIdToken = async userIdToken => {
 		this.setState({ userIdToken: userIdToken });
 		const userCredit = await API.get("bounties", "/credit");
-		//const userCredit={credit:5}
 		this.setState({ userIdToken: userIdToken, userCredit:userCredit.credit }); 
     };
 

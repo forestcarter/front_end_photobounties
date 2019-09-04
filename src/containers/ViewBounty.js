@@ -18,7 +18,7 @@ export default class ViewBounty extends Component {
         this.file = null;
 
         this.state = {
-			acceptBounty: true,
+            acceptBounty: true,
             review: false,
             isPoster: false,
             isClaimer: false,
@@ -35,8 +35,8 @@ export default class ViewBounty extends Component {
                 acceptBounty: !prevState.acceptBounty
             }));
         }
-	};
-	
+    };
+
     handleTextChange = event => {
         this.setState({
             disputeThanksText: event.target.value
@@ -45,71 +45,71 @@ export default class ViewBounty extends Component {
 
     async componentDidMount() {
         try {
-			const bounty = await this.getBounty();
+            const bounty = await this.getBounty();
 
+            const isPoster =
+                bounty.userId === this.props.userIdToken
+                    ? this.props.userIdToken.idToken.payload["cognito:username"]
+                    : false;
+            const isClaimer =
+                bounty.claimer === this.props.userIdToken
+                    ? this.props.userIdToken.idToken.payload["cognito:username"]
+                    : false;
 
-			const isPoster =
-				bounty.userId === this.props.userIdToken?this.props.userIdToken.idToken.payload['cognito:username']:false;
-			const isClaimer =
-				bounty.claimer === this.props.userIdToken? this.props.userIdToken.idToken.payload['cognito:username']:false;
-			
             if (bounty.submission) {
-				this.setState({
-					review: true
-				}); 
-				
-				if(isPoster||isClaimer){
-					const submissionURL = await Storage.vault.get(
-					bounty.submission
-					);
-					this.setState({
-						submissionURL: submissionURL
-					}); 
-				}
-			}
-				
-				this.setState({
+                this.setState({
+                    review: true
+                });
+
+                if (isPoster || isClaimer) {
+                    const submissionURL = await Storage.vault.get(
+                        bounty.submission
+                    );
+                    this.setState({
+                        submissionURL: submissionURL
+                    });
+                }
+            }
+
+            this.setState({
                 bounty: bounty,
                 isPoster,
-                isClaimer,
-			});
-                
-			console.log(bounty);
-			console.log(isClaimer)
+                isClaimer
+            });
+
         } catch (e) {
             alert(e);
         }
     }
 
     getBounty() {
-		console.log(this.props.match.params)
         return API.get(
             "bounties",
-            `/bounties/${this.props.match.params.userId}/${
-                this.props.match.params.bountyId
-            }`
+            `/bounties/${this.props.match.params.userId}/${this.props.match.params.bountyId}`
         );
     }
 
     attachSubmission(attachment) {
         return API.put("bounties", "/bounties", {
             body: {
-				userId: this.state.bounty.userId,
+                userId: this.state.bounty.userId,
                 bountyId: this.props.match.params.bountyId,
                 claiming: true,
-				claimerId: this.props.userIdToken.idToken.payload['cognito:username'],
+                claimerId: this.props.userIdToken.idToken.payload[
+                    "cognito:username"
+                ],
                 submission: attachment
             }
         });
     }
     submitText(accept, text) {
-		const disputing = this.state.isClaimer?'claimer':'poster'
+        const disputing = this.state.isClaimer ? "claimer" : "poster";
         return API.put("bounties", "/bounties", {
             body: {
                 userId: this.state.bounty.userId,
                 bountyId: this.props.match.params.bountyId,
-				claiming: false,
-				disputing:disputing,
+                claiming: false,
+                disputing: disputing,
                 disputeBool: !accept,
                 disputeText: text
             }
@@ -168,7 +168,6 @@ export default class ViewBounty extends Component {
     };
 
     render() {
-		console.log(this.state)
         return (
             <div className="bounties">
                 {this.state.bounty && (
@@ -214,7 +213,8 @@ export default class ViewBounty extends Component {
                                     isLoading={this.state.isLoading}
                                     disabled={
                                         !(
-                                            this.props.isAuthenticated && !this.state.isPoster &&
+                                            this.props.isAuthenticated &&
+                                            !this.state.isPoster &&
                                             formatExpire(
                                                 this.state.bounty
                                             ).includes(" ")
@@ -229,152 +229,32 @@ export default class ViewBounty extends Component {
                                 />
                             </div>
                         ) : (
-							//If a submission is present 
-							<div>
-							{(this.state.isPoster||this.state.isClaimer) && (
-                                <FormGroup>
-                                    <ControlLabel>Submitted Photo</ControlLabel>
-                                    <FormControl.Static>
-                                        <a
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            href={this.state.submissionURL}
-                                        >
-                                            {this.formatFilename(
-                                                this.state.bounty.submission
-                                            )}
-                                        </a>
-                                    </FormControl.Static>
-								</FormGroup>
-							)}
+                            //If a submission is present
+                            <div>
+                                {(this.state.isPoster ||
+                                    this.state.isClaimer) && (
+                                    <FormGroup>
+                                        <ControlLabel>
+                                            Submitted Photo
+                                        </ControlLabel>
+                                        <FormControl.Static>
+                                            <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                href={this.state.submissionURL}
+                                            >
+                                                {this.formatFilename(
+                                                    this.state.bounty.submission
+                                                )}
+                                            </a>
+                                        </FormControl.Static>
+                                    </FormGroup>
+                                )}
                                 {this.state.isPoster && (
-									<div>
-                                    {this.state.bounty.posterDispute ===
-											null && (
-												//If poster is looking and has not submitted a dispute
-											<div>
-												<div className="form-check">
-													<label>
-														<input
-															type="radio"
-															name="react-tips"
-															value="option1"
-															checked={
-																this.state
-																	.acceptBounty ===
-																true
-															}
-															className="form-check-input"
-															onChange={
-																this.handleOptionChange
-															}
-														/>
-														Accept Bounty
-													</label>
-												</div>
-
-												<div className="form-check">
-													<label>
-														<input
-															type="radio"
-															name="react-tips"
-															value="option2"
-															className="form-check-input"
-															checked={
-																this.state
-																	.acceptBounty ===
-																false
-															}
-															onChange={
-																this
-																	.handleOptionChange
-															}
-														/>
-														Dispute Bounty
-													</label>
-												</div>
-
-												<FormGroup controlId="description">
-													<ControlLabel />
-													<FormControl
-														onChange={
-															this.handleTextChange
-														}
-														componentClass="textarea"
-														placeholder={
-															this.state.acceptBounty
-																? "Thank you note"
-																: "Describe why you are disputing the submitted bounty"
-														}
-													/>
-												</FormGroup>
-
-												<LoaderButton
-													block
-													bsStyle="primary"
-													bsSize="large"
-													type="submit"
-													isLoading={this.state.isLoading}
-													text={
-														this.state.acceptBounty
-															? "Accept Bounty"
-															: "Dispute Bounty"
-													}
-													loadingText="Submitting ..."
-												/>
-											</div>
-										)}
-									
-
-									{this.state.bounty.posterDispute ===
-											false && (
-											<div>
-												<h3>Status: You accepted this bounty submission</h3>
-											</div>
-										)}
-
-									{this.state.bounty.posterDispute && this.state.bounty.claimerDispute === null
-											&& (
-											<div>
-												<FormGroup controlId="description">
-													<ControlLabel>Poster's Comments</ControlLabel>
-														<FormControl
-														componentClass="textarea"
-														value={this.state.bounty.posterDisputeText}
-														readOnly
-													/>
-												</FormGroup>
-												<h3>Status: Waiting for claimer to review dispute</h3>
-											</div>
-										)}
-									{this.state.bounty.posterDispute && this.state.bounty.claimerDispute
-											&& (
-											<div>
-												<h3>Status: Claimer rejected Dispute</h3>
-												<StaffRuling
-													ruledForPoster={this.state.bounty.ruledForPoster}
-													rulingText={this.state.bounty.rulingText}
-												/>
-											</div>
-										)}
-									</div>
-								)//End if poster
-							}			
-													
-                                {this.state.isClaimer && this.state.bounty.posterDispute && (
-									<div>
-
-									<FormGroup controlId="description">
-										<ControlLabel>Poster's Comments</ControlLabel>
-									<FormControl
-											componentClass="textarea"
-											value={this.state.bounty.posterDisputeText}
-											readOnly
-										/>
-									</FormGroup>
- 
-                                        {this.state.bounty.claimerDispute ===
+                                    <div>
+                                        {this.state.bounty.posterDispute ===
                                             null && (
+                                            //If poster is looking and has not submitted a dispute
                                             <div>
                                                 <div className="form-check">
                                                     <label>
@@ -389,10 +269,11 @@ export default class ViewBounty extends Component {
                                                             }
                                                             className="form-check-input"
                                                             onChange={
-                                                                this.handleOptionChange
+                                                                this
+                                                                    .handleOptionChange
                                                             }
                                                         />
-                                                        Accept Dispute
+                                                        Accept Bounty
                                                     </label>
                                                 </div>
 
@@ -409,10 +290,11 @@ export default class ViewBounty extends Component {
                                                                 false
                                                             }
                                                             onChange={
-                                                                this.handleOptionChange
+                                                                this
+                                                                    .handleOptionChange
                                                             }
                                                         />
-                                                        Reject Dispute
+                                                        Dispute Bounty
                                                     </label>
                                                 </div>
 
@@ -420,14 +302,15 @@ export default class ViewBounty extends Component {
                                                     <ControlLabel />
                                                     <FormControl
                                                         onChange={
-                                                            this.handleTextChange
+                                                            this
+                                                                .handleTextChange
                                                         }
                                                         componentClass="textarea"
                                                         placeholder={
                                                             this.state
                                                                 .acceptBounty
-                                                                ? "Comments"
-                                                                : "Describe why you are rejecting the dispute"
+                                                                ? "Thank you note"
+                                                                : "Describe why you are disputing the submitted bounty"
                                                         }
                                                     />
                                                 </FormGroup>
@@ -442,35 +325,203 @@ export default class ViewBounty extends Component {
                                                     }
                                                     text={
                                                         this.state.acceptBounty
-                                                            ? "Accept Dispute"
-                                                            : "Reject Dispute"
+                                                            ? "Accept Bounty"
+                                                            : "Dispute Bounty"
                                                     }
                                                     loadingText="Submitting ..."
                                                 />
                                             </div>
                                         )}
 
-                                        {this.state.bounty.claimerDispute ===
+                                        {this.state.bounty.posterDispute ===
                                             false && (
                                             <div>
-                                                <h3>Status: You accepted this dispute. The bounty is canceled.</h3>
+                                                <h3>
+                                                    Status: You accepted this
+                                                    bounty submission
+                                                </h3>
                                             </div>
                                         )}
 
-                                        {this.state.bounty.claimerDispute ===
-                                            true && (
-                                            <div>
-												<h3>Status: You rejected this dispute.</h3>
-												<StaffRuling
-													ruledForPoster={this.state.bounty.ruledForPoster}
-													rulingText={this.state.bounty.rulingText}
-												/>
-                                            </div>
-										)}
-										
-
+                                        {this.state.bounty.posterDispute &&
+                                            this.state.bounty.claimerDispute ===
+                                                null && (
+                                                <div>
+                                                    <FormGroup controlId="description">
+                                                        <ControlLabel>
+                                                            Poster's Comments
+                                                        </ControlLabel>
+                                                        <FormControl
+                                                            componentClass="textarea"
+                                                            value={
+                                                                this.state
+                                                                    .bounty
+                                                                    .posterDisputeText
+                                                            }
+                                                            readOnly
+                                                        />
+                                                    </FormGroup>
+                                                    <h3>
+                                                        Status: Waiting for
+                                                        claimer to review
+                                                        dispute
+                                                    </h3>
+                                                </div>
+                                            )}
+                                        {this.state.bounty.posterDispute &&
+                                            this.state.bounty
+                                                .claimerDispute && (
+                                                <div>
+                                                    <h3>
+                                                        Status: Claimer rejected
+                                                        Dispute
+                                                    </h3>
+                                                    <StaffRuling
+                                                        ruledForPoster={
+                                                            this.state.bounty
+                                                                .ruledForPoster
+                                                        }
+                                                        rulingText={
+                                                            this.state.bounty
+                                                                .rulingText
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
                                     </div>
-                                )}
+                                ) //End if poster
+                                }
+
+                                {this.state.isClaimer &&
+                                    this.state.bounty.posterDispute && (
+                                        <div>
+                                            <FormGroup controlId="description">
+                                                <ControlLabel>
+                                                    Poster's Comments
+                                                </ControlLabel>
+                                                <FormControl
+                                                    componentClass="textarea"
+                                                    value={
+                                                        this.state.bounty
+                                                            .posterDisputeText
+                                                    }
+                                                    readOnly
+                                                />
+                                            </FormGroup>
+
+                                            {this.state.bounty
+                                                .claimerDispute === null && (
+                                                <div>
+                                                    <div className="form-check">
+                                                        <label>
+                                                            <input
+                                                                type="radio"
+                                                                name="react-tips"
+                                                                value="option1"
+                                                                checked={
+                                                                    this.state
+                                                                        .acceptBounty ===
+                                                                    true
+                                                                }
+                                                                className="form-check-input"
+                                                                onChange={
+                                                                    this
+                                                                        .handleOptionChange
+                                                                }
+                                                            />
+                                                            Accept Dispute
+                                                        </label>
+                                                    </div>
+
+                                                    <div className="form-check">
+                                                        <label>
+                                                            <input
+                                                                type="radio"
+                                                                name="react-tips"
+                                                                value="option2"
+                                                                className="form-check-input"
+                                                                checked={
+                                                                    this.state
+                                                                        .acceptBounty ===
+                                                                    false
+                                                                }
+                                                                onChange={
+                                                                    this
+                                                                        .handleOptionChange
+                                                                }
+                                                            />
+                                                            Reject Dispute
+                                                        </label>
+                                                    </div>
+
+                                                    <FormGroup controlId="description">
+                                                        <ControlLabel />
+                                                        <FormControl
+                                                            onChange={
+                                                                this
+                                                                    .handleTextChange
+                                                            }
+                                                            componentClass="textarea"
+                                                            placeholder={
+                                                                this.state
+                                                                    .acceptBounty
+                                                                    ? "Comments"
+                                                                    : "Describe why you are rejecting the dispute"
+                                                            }
+                                                        />
+                                                    </FormGroup>
+
+                                                    <LoaderButton
+                                                        block
+                                                        bsStyle="primary"
+                                                        bsSize="large"
+                                                        type="submit"
+                                                        isLoading={
+                                                            this.state.isLoading
+                                                        }
+                                                        text={
+                                                            this.state
+                                                                .acceptBounty
+                                                                ? "Accept Dispute"
+                                                                : "Reject Dispute"
+                                                        }
+                                                        loadingText="Submitting ..."
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {this.state.bounty
+                                                .claimerDispute === false && (
+                                                <div>
+                                                    <h3>
+                                                        Status: You accepted
+                                                        this dispute. The bounty
+                                                        is canceled.
+                                                    </h3>
+                                                </div>
+                                            )}
+
+                                            {this.state.bounty
+                                                .claimerDispute === true && (
+                                                <div>
+                                                    <h3>
+                                                        Status: You rejected
+                                                        this dispute.
+                                                    </h3>
+                                                    <StaffRuling
+                                                        ruledForPoster={
+                                                            this.state.bounty
+                                                                .ruledForPoster
+                                                        }
+                                                        rulingText={
+                                                            this.state.bounty
+                                                                .rulingText
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                             </div>
                         )}
                     </form>

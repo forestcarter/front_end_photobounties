@@ -6,8 +6,6 @@ import { LinkContainer } from "react-router-bootstrap";
 import BountyItem from "../components/BountyItem";
 import BountyItemTitle from "../components/BountyItemTitle";
 import formatExpire from "../functions";
-
-//import BootstrapTable from "react-bootstrap-table-next";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import "react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css";
 
@@ -21,26 +19,24 @@ export default class Home extends Component {
         };
     }
 
-	updateStatusChoice= e => {
-		const choice = e.target.value;
-		this.setState(() => ({ statusChoice:choice }));
-	}
+    updateStatusChoice = e => {
+        const choice = e.target.value;
+        this.setState(() => ({ statusChoice: choice }));
+    };
 
     async componentDidMount() {
         try {
-			const bounties = await this.bounties();
-			const bountiesToSet= this.props.onlyUserBounties? bounties.filter(bounty => {
-                return (
-					bounty.userId ===
-					this.props.userIdToken.idToken.payload["cognito:username"]
-				)}): bounties
-            // var filtered = bounties.filter(bounty => {
-            //     return (
-			// 		bounty.userId ===
-			// 		this.props.userIdToken.idToken.payload["cognito:username"]
-			// 	);
-			// });
-			
+            const bounties = await this.bounties();
+            const bountiesToSet = this.props.onlyUserBounties
+                ? bounties.filter(bounty => {
+                      return (
+                          bounty.userId ===
+                          this.props.userIdToken.idToken.payload[
+                              "cognito:username"
+                          ]
+                      );
+                  })
+                : bounties;
 
             this.setState({ bounties: bountiesToSet });
         } catch (e) {
@@ -60,8 +56,8 @@ export default class Home extends Component {
                 <ListGroup>
                     <ListGroupItem>
                         <BountyItemTitle
-							statusChoice={this.state.statusChoice}
-							updateStatusChoice={this.updateStatusChoice}
+                            statusChoice={this.state.statusChoice}
+                            updateStatusChoice={this.updateStatusChoice}
                         />
                     </ListGroupItem>
                     {!this.state.isLoading &&
@@ -72,15 +68,19 @@ export default class Home extends Component {
     }
 
     renderBountiesList(bounties) {
-		const checkBountyStatus = (exp,statusChoice)=>{
-			if(statusChoice===exp || (statusChoice==='Active' && exp.includes('Expires') )){
-				return true
-			}else{
-				return false
-			}
-		}
+        const checkBountyStatus = (exp, statusChoice) => {
+            if (
+                statusChoice === exp ||
+                (statusChoice === "Active" && exp.includes("Expires"))
+            ) {
+                return true;
+            } else {
+                return false;
+            }
+        };
         return [{}].concat(bounties).map((bounty, i) =>
-            i !== 0 && checkBountyStatus(formatExpire(bounty), this.state.statusChoice)? (
+            i !== 0 &&
+            checkBountyStatus(formatExpire(bounty), this.state.statusChoice) ? (
                 <LinkContainer
                     key={bounty.bountyId}
                     to={`/bounties/${bounty.userId}/${bounty.bountyId}`}
@@ -89,7 +89,7 @@ export default class Home extends Component {
                         <BountyItem
                             title={bounty.title}
                             exp={formatExpire(bounty)}
-							value={bounty.value}
+                            value={bounty.value}
                         />
                     </ListGroupItem>
                 </LinkContainer>

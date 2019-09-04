@@ -1,10 +1,19 @@
 @media all and (min-width: 480px) {
-  .Login {
-    padding: 60px 0;
-  }
+    .Login {
+        padding: 60px 0;
+    }
 
-  .Login form {
-    margin: 0 auto;
-    max-width: 320px;
-  }
+    .Login form {
+        margin: 0 auto;
+        max-width: 320px;
+    }
+
+    .Login button {
+        margin: 0 auto;
+        max-width: 320px;
+    }
+    .GoogleButton {
+        margin: 0 auto;
+        max-width: 320px;
+    }
 }

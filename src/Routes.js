@@ -11,15 +11,15 @@ import MyBounties from "./containers/MyBounties";
 
 //import AuthenticatedRoute from "./components/AuthenticatedRoute";
 import UnauthenticatedRoute from "./components/UnauthenticatedRoute";
-import HowItWorks from "./containers/howitworks";
+import Splash from "./containers/Splash";
 
 
 export default ({ childProps }) =>
   <Switch>
-    <Route path="/" exact component={Home} props={childProps} />
+	<Route path="/" exact component={Splash} props={childProps} />
+    <Route path="/home" exact component={Home} props={childProps} />	
     <UnauthenticatedRoute path="/login" exact component={Login} props={childProps} />
     <UnauthenticatedRoute path="/signup" exact component={Signup} props={childProps} />
-    <UnauthenticatedRoute path="/howitworks" exact component={HowItWorks} props={childProps} />
 	<AppliedRoute path="/bounties/:userId/:bountyId" exact component={ViewBounty} props={childProps} />
 
 	<AppliedRoute path="/new" exact component={NewBounty} props={childProps} />
