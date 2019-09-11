@@ -46,7 +46,7 @@ export default class ViewBounty extends Component {
     async componentDidMount() {
         try {
             const bounty = await this.getBounty();
-
+			
             const isPoster =
                 bounty.userId === this.props.userIdToken
                     ? this.props.userIdToken.idToken.payload["cognito:username"]

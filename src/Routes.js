@@ -20,7 +20,7 @@ export default ({ childProps }) =>
     <Route path="/home" exact component={Home} props={childProps} />	
     <UnauthenticatedRoute path="/login" exact component={Login} props={childProps} />
     <UnauthenticatedRoute path="/signup" exact component={Signup} props={childProps} />
-	<AppliedRoute path="/bounties/:userId/:bountyId" exact component={ViewBounty} props={childProps} />
+	<Route path="/bounties/:userId/:bountyId" exact component={ViewBounty} props={childProps} />
 
 	<AppliedRoute path="/new" exact component={NewBounty} props={childProps} />
 	<AppliedRoute path="/mybounties" exact component={MyBounties} props={childProps} />
